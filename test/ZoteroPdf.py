@@ -6,7 +6,7 @@ class ZoteroPdf:
     def __init__(self, zot):
         self.zot = zot
 
-    def build_dict(self, collection_name):
+    def build_text_dict(self, collection_name):
         # init dictionary with item title as key and item text as value (maybe is better to use the key as key...)
         item_dict = {}
 
@@ -22,7 +22,7 @@ class ZoteroPdf:
 
             # Get item title and key
             item_title = self.traverse_dict(item, key_desired='title')
-            item_key = item['key']
+            #item_key = item['key']
 
             # Find item url to pdf
             try:        
@@ -55,6 +55,53 @@ class ZoteroPdf:
         print(item_dict)
         return item_dict
 
+    def build_url_dict(self, collection_name):
+        # init dictionary with item title as key and item text as value (maybe is better to use the key as key...)
+        item_dict = {}
+
+        # Get collection ID
+        collection_id = self.get_collection_id(collection_name)
+
+        # Get all items from the collection
+        items = self.zot.everything(self.zot.collection_items(collection_id))
+
+        # Counter to check how many items are being checked
+        counter = 0
+        for item in items:
+
+            # Get item title and key
+            item_title = self.traverse_dict(item, key_desired='title')
+            #item_key = item['key']
+
+            # Find item url to pdf
+            try:        
+                print(f"\nChecking item {items.index(item) + 1} out of {len(items)}.", "Title:", item_title)
+                item_url = self.traverse_dict(item, key_desired='url')
+                print("url:", item_url)
+            except:
+                print(f"Error: {item_title} has no url\n")
+                continue
+
+            # Add item title and text to dictionary
+            if item_url != None and len(item_url) > 2:
+                counter += 1
+                item_dict[item_title] = item_url
+
+        # Print number of items checked
+        print(f"\Retrieved {counter} items.\n")
+        print(item_dict)
+        return item_dict
+
+    def get_publication_year(self, item):
+        # Get publication year
+        print(item)
+        try:
+            publication_year = self.traverse_dict(item, key_desired='date')
+            publication_year = publication_year.split("-")[0]
+        except:
+            publication_year = None
+        return publication_year
+
     def get_collection_id(self, collection_name):
         # Retrieve a list of top-level collections
         collections = self.zot.collections()
@@ -80,7 +127,7 @@ class ZoteroPdf:
         # Extract the text from the PDF file
         pdf_text = ""
         for i in range(len(pdfdoc_remote.pages)):
-            print("Loading page:", i)
+            #print("Loading page:", i)
             page = pdfdoc_remote.pages[i]
             page_content = page.extract_text()
             pdf_text += page_content

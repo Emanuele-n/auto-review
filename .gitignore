@@ -1,4 +1,7 @@
-OpenAI.py
+api/*
+plugin/*
+test/OpenAI.py
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

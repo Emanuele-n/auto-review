@@ -1,6 +1,7 @@
 api/*
 plugin/*
 test/OpenAI.py
+test/config.ini
 
 
 # Byte-compiled / optimized / DLL files

@@ -6,7 +6,21 @@ class ZoteroPdf:
     def __init__(self, zot):
         self.zot = zot
 
-    def build_text_dict(self, collection_name):
+    # Input: tags as list of strings
+    # Output: dictionary with item title as key and item url as value
+    def get_papers_by_tags(self, tags):
+
+        # Call the items() method with the search query
+        items = self.zot.items(tag=tags)
+
+        # Get dict with item title as key and url as value
+        items_with_tags = self.get_dict_from_items(items)
+        
+        return items_with_tags
+
+    # Input: collection name
+    # Output: dictionary with item title as key and item text as value    
+    def get_text_dict(self, collection_name):
         # init dictionary with item title as key and item text as value (maybe is better to use the key as key...)
         item_dict = {}
 
@@ -55,15 +69,15 @@ class ZoteroPdf:
         print(item_dict)
         return item_dict
 
-    def build_url_dict(self, collection_name):
+    # Get dictionary with item title as key and item text as value
+    # Input: list of items
+    # Output: dictionary with item title as key and item text as value
+    def get_dict_from_items(self, items):
         # init dictionary with item title as key and item text as value (maybe is better to use the key as key...)
         item_dict = {}
 
-        # Get collection ID
-        collection_id = self.get_collection_id(collection_name)
-
-        # Get all items from the collection
-        items = self.zot.everything(self.zot.collection_items(collection_id))
+        # Get number of items
+        num_items = len(items)
 
         # Counter to check how many items are being checked
         counter = 0
@@ -88,20 +102,26 @@ class ZoteroPdf:
                 item_dict[item_title] = item_url
 
         # Print number of items checked
-        print(f"\Retrieved {counter} items.\n")
+        print(f"\Retrieved {counter} items out of {num_items}.\n")
         print(item_dict)
         return item_dict
 
-    def get_publication_year(self, item):
-        # Get publication year
-        print(item)
-        try:
-            publication_year = self.traverse_dict(item, key_desired='date')
-            publication_year = publication_year.split("-")[0]
-        except:
-            publication_year = None
-        return publication_year
+    # Get all papers in a collection
+    # Input: collection name
+    # Output: dictionary with item title as key and item url as value
+    def get_url_dict(self, collection_name):
+        # Get collection ID
+        collection_id = self.get_collection_id(collection_name)
 
+        # Get all items from the collection
+        items = self.zot.everything(self.zot.collection_items(collection_id))
+
+        # Get dictionary with item title as key and item url as value
+        item_dict = self.get_dict_from_items(items)
+        return item_dict
+
+    # Input: collection name
+    # Output: collection ID
     def get_collection_id(self, collection_name):
         # Retrieve a list of top-level collections
         collections = self.zot.collections()
@@ -116,7 +136,9 @@ class ZoteroPdf:
         print(f"The ID for the {collection_name} collection is {collection_id}.")
 
         return collection_id
-        
+    
+    # Input: paper url
+    # Output: paper text
     def get_pdf_text(self, pdf_url):
         # Download the PDF file from the URL insert as input
         req = urllib.request.Request(pdf_url, headers={"User-Agent": "Chrome"})
@@ -135,6 +157,8 @@ class ZoteroPdf:
         print("PDF text loaded\n")
         return pdf_text
 
+    # Input: dictionary, key desired
+    # Output: value of the key desired
     def traverse_dict(self, dict_obj, key_desired=None):
         # If key == key_desired, return value
         if key_desired:

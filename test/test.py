@@ -16,22 +16,29 @@ zpdf = ZoteroPdf.ZoteroPdf(zot)
 # Set collection name you want to get
 collection_name = 'Modern Object Detectors'
 
-# Build dictionary with item title as key and item text as value
-""" item_dict = zpdf.build_text_dict(collection_name)
+# Get papers with the desired tags
+tags = ['computer vision', 'object detection']
+
+# Get papers with the desired tags
+items = zpdf.get_papers_by_tags(tags)
+print(items)
+
+# Get dictionary with item title as key and item text as value
+""" item_dict = zpdf.get_text_dict(collection_name)
 
 # Get first item in the dictionary
 item = list(item_dict.items())[0]
 print(item) """
 
-# Build dictionary with item title as key and item URL as value
-item_dict = zpdf.build_url_dict(collection_name)
+""" # Get dictionary with item title as key and item URL as value
+item_dict = zpdf.get_url_dict(collection_name)
 
 # Print every item in the dictionary line by line
 for item in item_dict:
     print(item)
     print(item_dict[item])
     print()
-
+ """
 
 
 
